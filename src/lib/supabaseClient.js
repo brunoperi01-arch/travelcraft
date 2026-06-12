@@ -1,9 +1,22 @@
 import { createClient } from "@supabase/supabase-js";
 
-export const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+/* ── Garde-fou : variables d'environnement manquantes ─────────
+   Évite la page blanche si Vercel n'a pas les clés au build.   */
+const url = import.meta.env.VITE_SUPABASE_URL;
+const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!url || !key) {
+  document.body.innerHTML =
+    '<div style="font-family:sans-serif;padding:40px;max-width:520px;margin:auto;line-height:1.6">' +
+    "<h2>⚙️ Configuration manquante</h2>" +
+    "<p>Les variables <code>VITE_SUPABASE_URL</code> et <code>VITE_SUPABASE_ANON_KEY</code> " +
+    "ne sont pas définies.</p>" +
+    "<p>Ajoutez-les dans <b>Vercel → Settings → Environment Variables</b> " +
+    "(valeurs dans Supabase → Settings → API), puis <b>Redeploy</b>.</p></div>";
+  throw new Error("Variables Supabase manquantes (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY)");
+}
+
+export const supabase = createClient(url, key);
 
 /* Slug privé difficile à deviner : lisbonne-2026-x7f92kd1 */
 export function makeSlug(destination) {
